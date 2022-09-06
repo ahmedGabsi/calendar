@@ -97,7 +97,7 @@ const addEvent = (newEvent)=>{
 
 
 export const addEventApi = (values) => async dispatch =>{
-    console.log(values)
+    console.log("values",values)
     const result = await event.post("/", {
          title: values.title,
          start: values.start,
@@ -105,7 +105,7 @@ export const addEventApi = (values) => async dispatch =>{
          describe: values.describe
        })
        .then(res=>{
-        
+        console.log("res.data",res.data)
         if(res && res.data){
             console.log("event from the api going to the reducer: ", res.data)
             dispatch(addEvent(res.data)) 
@@ -135,7 +135,9 @@ const updateEvent = (updatedEvent)=>{
 
 
 export const updateEventApi = (values, id) => async dispatch =>{
-    console.log("values",values)
+ 
+
+    
     try{
         const result = await event.put(`/${id}/update`, {
             title: values.title,
@@ -145,7 +147,7 @@ export const updateEventApi = (values, id) => async dispatch =>{
           })
           
           const response = result.data;
-          dispatch(updateEvent(values))
+          dispatch(updateEvent({...values,id}))
           dispatch(removeError())
           return "response was successful";
     }catch(err){

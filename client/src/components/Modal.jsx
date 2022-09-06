@@ -38,16 +38,17 @@ const AddEvents = ({ addEventApi, error, OnshowModal, event }) => {
       setError(error);
     }
     if (!error.start && !error.end && dbError !== false) {
-      setTimeout(navigate("/"));
+      OnshowModal(false);
     }
-  }, [rerender, error, navigate]);
+  }, [rerender, error, navigate,firstRender]);
   //using form-hook to register event data
   const {
     register,
     handleSubmit,
     formState: { errors },
     control,
-  } = useForm({});
+  } = useForm({      resolver: yupResolver(schema)
+  });
 
   //   useEffect(() => {
   //     if (currentEvent) {
@@ -62,12 +63,10 @@ const AddEvents = ({ addEventApi, error, OnshowModal, event }) => {
     setFirstRender(false);
     addEventApi(values).then(() => {
       setRerender(!rerender);
-      OnshowModal(false);
-      alert("render");
-    });
+      
+    })
   };
 
-  console.log(tooltip);
   return ReactDOM.createPortal(
     <div
       id="authentication-modal"

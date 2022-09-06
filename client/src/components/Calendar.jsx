@@ -16,7 +16,9 @@ import moment from "moment";
 import { useNavigate } from 'react-router-dom'
 import Modal from './Modal'
 import Popp from './Popp'
+import ModalUpdateEvent from './ModalUpdateEvent'
 
+import {DocumentFullScreen} from "@chiragrupani/fullscreen-react"
 const locales = {
   fr: fr,
 }
@@ -28,12 +30,14 @@ const localizer = momentLocalizer(moment);
 const DnDCalendar = withDragAndDrop(Calendar);
 
 
-const MyCalendar = ({events, ShowEventApi, closeEvent, ShowEventsApi,updateEventApi}) => {
+const MyCalendar = ({events, ShowEventApi,darkMode, closeEvent, ShowEventsApi,updateEventApi,showModal,setShowModal,fullscreen,setFullscreen}) => {
     const [open, setOpen] = useState(false);
     const [box,setBox] = useState("");
     const [renderStatus, rerender] = useState(false);
-    const [showModal, setShowModal] = useState(false);
+    const [showUpdateModal, setShowUpdateModal] = useState(false);
+    const [idEvent, setIdEvent] = useState("");
     const [selectEvent,setSelectEvent] = useState({});
+    const mode=localStorage.getItem("mode")
     const eventStyleGetter=(event, start, end, isSelected)=> {
       console.log(event);
       var backgroundColor = '#' + event.hexColor;
@@ -49,7 +53,6 @@ const MyCalendar = ({events, ShowEventApi, closeEvent, ShowEventsApi,updateEvent
           style: style
       };
   }
-    const navigate = useNavigate()
     useEffect(()=>{
       ShowEventsApi()
       console.log("i renderd because of refresh or start");
@@ -60,31 +63,30 @@ const MyCalendar = ({events, ShowEventApi, closeEvent, ShowEventsApi,updateEvent
       ShowEventsApi()
       console.log("i renderd");
     },[renderStatus])
-  
+
     const openEventClick = async (event,box)=>{
          setBox({x:box.clientX,y:box.clientY})
-         if(event.id ) {
-          await ShowEventApi( event.id);
+         const id=event.id||event._id
+         setIdEvent(String(id))
+         if(id ) {
+          await ShowEventApi( String(event.id));
           setOpen(true)
 
          }
-         else if(event._id ) {
-         await ShowEventApi( event._id);
-          setOpen(true)
 
-         }
-         
-         return;
+
+         return ;
     }
 
     const closeEventClick = () =>{
       setOpen(false);
       setTimeout(()=>closeEvent(),300) ;
     }
-    
+
   const onEventResize = (data) => {
     const { start, end } = data;
-    updateEventApi({...data.event,start,end},data.event.id)
+    
+    updateEventApi({...data.event,start,end},String(data.event.id))
     // const renderedEvents = eventsC.filter(event => event.id !==data.id);
 
     // setEventsC([...renderedEvents,{...data,start,end}])
@@ -93,31 +95,39 @@ const MyCalendar = ({events, ShowEventApi, closeEvent, ShowEventsApi,updateEvent
     // rerender(true)
 
     // console.log("test",{start,end,...data.event})
-    
+
     // this.setState((state) => {
     //   state.events[0].start = start;
     //   state.events[0].end = end;
     //   return { events: [...state.events] };
     // });
-    console.log("data",showModal);
   };
   const resizeEvent = (data) => {
-  
+
     const { start, end } = data;
+    console.log("data.event.id",data.event.id)
+
     updateEventApi({...data.event,start,end},data.event.id)
 
-   
+
   };
+  let style=fullscreen && darkMode?{width:"100vw",height:"100vh" ,padding:"2px",backgroundColor:"black",color:"white"}:fullscreen && !darkMode?{ width:"100vw",height:"100vh" ,padding:"2px",backgroundColor:"white",color:"black" }:!fullscreen && darkMode?{ height: 500 , margin: 20,backgroundColor:"black",color:"white" }:{ height: 500 , margin: 20,backgroundColor:"white",color:"black" }
     return (
-    <div>
-                  {showModal && <Modal OnshowModal={setShowModal} event={selectEvent}/>} 
-        
+      <div className={` ${darkMode ?"black":"white"} `}>
+      <DocumentFullScreen
+        isFullScreen={fullscreen}
+        onChange={() => setFullscreen(!fullscreen)}
+       
+      >
+                  {showModal && <Modal OnshowModal={setShowModal} event={selectEvent}/>}
+                  {showUpdateModal && <ModalUpdateEvent id={idEvent} OnshowUpdateModal={setShowUpdateModal} event={selectEvent}/>}
         {box && open &&
-        <Popp 
+        <Popp
         box={box}
-         handleOpen={openEventClick} 
-         handleClose={closeEventClick} 
-         renderStatus = {renderStatus} 
+         handleOpen={openEventClick}
+         handleClose={closeEventClick}
+         renderStatus = {renderStatus}
+         OnshowUpdateModal={setShowUpdateModal}
          rerender= {rerender}/>
         }
 
@@ -127,15 +137,18 @@ const MyCalendar = ({events, ShowEventApi, closeEvent, ShowEventsApi,updateEvent
             events={events}
             startAccessor="start"
             endAccessor="end"
-            style={{ height: 500 , margin: 50, fontFamily: 'Patrick Hand' }}
+            style={style}
             onSelectEvent={openEventClick}
             onEventDrop={resizeEvent}
             onEventResize={onEventResize}
+                  // dayPropGetter={calendarStyle}
+        
             // onSelectSlot={(event)=>navigate('/events/add',{state:{event}})}
             // eventPropGetter={eventStyleGetter}
 
             onSelectSlot={event =>{
               setSelectEvent(event)
+
               setShowModal(true)
               // alert(
             //   `selected slot: \n\nstart ${event.start.toLocaleString()} ` +
@@ -146,8 +159,7 @@ const MyCalendar = ({events, ShowEventApi, closeEvent, ShowEventsApi,updateEvent
             }
           }
             resizable
-            
-            onDropFromOutside={()=>alert("ok")}
+
 
             messages={{
                     next: "Suivant",
@@ -166,9 +178,9 @@ const MyCalendar = ({events, ShowEventApi, closeEvent, ShowEventsApi,updateEvent
                     week: "Semaine",
                     day: "Jour"
                   }} */}
-      
-    </div>
-        
+
+    </DocumentFullScreen>
+</div>
     )
 }
 

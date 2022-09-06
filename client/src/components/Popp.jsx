@@ -1,4 +1,4 @@
-import React, { useState,useEffect } from "react";
+import React, { useState,useEffect, useLayoutEffect } from "react";
 import ReactDOM from "react-dom";
 
 import { connect } from "react-redux";
@@ -6,11 +6,12 @@ import {Link} from "react-router-dom"
 import { deleteEventApi, ShowEventsApi, closeEvent } from "../Redux/actions";
 import { useNavigate } from "react-router-dom";
 
-const Popping = ({ handleClose, event, deleteEventApi, renderStatus, rerender,box})=> {
+const Popping = ({ handleClose, event, deleteEventApi,OnshowUpdateModal, renderStatus, rerender,box})=> {
    const navigate = useNavigate();
    const {id, describe, title, start, end} = event;
    const [top,setTop]=useState(0)
-   useEffect( ()=>{
+
+   useLayoutEffect( ()=>{
     if(box.y > 400)
 setTop(+box.y-230)
 else 
@@ -24,9 +25,9 @@ console.log(box)
    }
    return ReactDOM.createPortal(
 
-    <div id="popup-modal" tabIndex="-1" className={`overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 md:inset-0 h-modal md:h-full`}>
-    <div className="relative  w-full max-w-md h-full md:h-auto">
-        <div className={`relative  bg-white rounded-lg  shadow dark:bg-gray-700  `} style={{
+    <div id="popup-modal" tabIndex="-1"  className={` delay-[5000ms] ease-in-out overflow-y-auto overflow-x-hidden fixed top-0 right-0 left-0 z-50 md:inset-0 h-modal md:h-full`}>
+    <div className="relative delay-[5000ms] ease-in-out  w-full max-w-md h-full md:h-auto ">
+        <div className={`relative  delay-[5000ms] bg-white rounded-lg  shadow dark:bg-gray-700  `} style={{
             top: `${top}px`,
             left: `${box.x/2}px`,
 
@@ -43,7 +44,7 @@ console.log(box)
               <p className="col small text-muted text-center pb-0 mb-0">A: {end}</p>
             </div>
             {/* <button className="focus:outline-none text-white bg-yellow-400 hover:bg-yellow-500 focus:ring-4 focus:ring-yellow-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:focus:ring-yellow-900" onClick={handleClose}>Fermer</button> */}
-            <Link to={`/event/${id}/update`}><button className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800">Mise a jour</button></Link>
+         <button className="focus:outline-none text-white bg-green-700 hover:bg-green-800 focus:ring-4 focus:ring-green-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-green-600 dark:hover:bg-green-700 dark:focus:ring-green-800" onClick={()=>{OnshowUpdateModal(true);handleClose()}}>Mise a jour</button>
             <button className="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900" onClick={handleDelete}>Supprimer</button>
             </div>
         </div>

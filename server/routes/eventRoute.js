@@ -53,7 +53,10 @@ router.post("/", async(req, res)=>{
 
 
 router.put("/:id/update", async (req, res)=>{
-    const id = req.params.id
+    const id = req.params.id.toString()
+   
+    console.log("req.body",req.body)
+
      try{
         const event = await Event.findOne({_id : id})
         if(event){

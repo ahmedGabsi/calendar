@@ -1,3 +1,27 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.black .rbc-btn-group button{
+    background-color: black;
+    color: white;
+  }
+  .black .rbc-btn-group button.rbc-active{
+    color: black;
+  }
+  .white .rbc-btn-group button{
+    background-color: white;
+    color: black;
+  }
+  .black .rbc-off-range-bg{
+    background-color:#6B7280
+
+}
+.black .rbc-today{
+    background-color:#374151
+}
+
+    .black .rbc-selected-cell{
+        background-color:#1F2937
+
+    }

@@ -13,8 +13,7 @@ const EventsReducer = (state=initialValue, action)=>{
     ]
     case "UPDATE_EVENT":
     const renderedEvents = state.filter(event => event.id !== action.payload.id);
-    console.log("aa ",action.payload)
-    console.log("state :",state)
+
     return [...renderedEvents,{...action.payload,id:action.payload.id}]
     
     // return [
